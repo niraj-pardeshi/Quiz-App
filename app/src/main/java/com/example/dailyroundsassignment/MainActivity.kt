@@ -21,7 +21,9 @@ import com.example.dailyroundsassignment.Navigation.Navgraph
 import com.example.dailyroundsassignment.Screens.QuestionScreen
 import com.example.dailyroundsassignment.Screens.ResultScreen
 import com.example.dailyroundsassignment.ui.theme.DailyRoundsAssignmentTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

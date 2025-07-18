@@ -26,13 +26,11 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
 @Composable
-fun LoadingScreen(
-    onDataLoaded: ()-> Unit
-) {
-    LaunchedEffect(Unit) {
-        delay(2000)
-        onDataLoaded()
-    }
+fun LoadingScreen() {
+//    LaunchedEffect(Unit) {
+//        delay(2000)
+//        onDataLoaded()
+//    }
 
     Box(
         modifier = Modifier

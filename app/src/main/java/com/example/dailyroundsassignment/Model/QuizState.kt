@@ -11,7 +11,9 @@ data class QuizState(
     val longestStreak: Int = 0,
     val isStreakActive: Boolean = false,
     val answeredQuestions: MutableList<Boolean> = mutableListOf(),
-    val isQuizCompleted: Boolean = false
+    val isQuizCompleted: Boolean = false,
+    val isLoading: Boolean = false, 
+    val error: String? = null
 ) {
     val currentQuestion: Question?
         get() = if (currentQuestionIndex < questions.size) questions[currentQuestionIndex] else null

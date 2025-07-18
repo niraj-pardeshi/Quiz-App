@@ -1,7 +1,7 @@
 package com.example.dailyroundsassignment.Navigation
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.dailyroundsassignment.QuizViewModel
+import com.example.dailyroundsassignment.Screens.ErrorScreen
 import com.example.dailyroundsassignment.Screens.LoadingScreen
 import com.example.dailyroundsassignment.Screens.QuestionScreen
 import com.example.dailyroundsassignment.Screens.ResultScreen
@@ -26,13 +27,26 @@ fun Navgraph(
         startDestination = Routes.Loading.route,
     ) {
         composable(Routes.Loading.route){
-            LoadingScreen(
-                onDataLoaded = {
-                    navController.navigate(Routes.Questions.route) {
-                        popUpTo(Routes.Loading.route) { inclusive = true }
-                    }
+            when {
+                quizState.isLoading -> {
+                    LoadingScreen()
                 }
-            )
+                quizState.error != null -> {
+                    ErrorScreen(quizState.error!!,
+                        onRetry = {
+                            viewModel.loadQuestions()
+                        }
+                    )
+                }
+                quizState.questions.isNotEmpty() -> {
+                    LaunchedEffect(Unit) {
+                        navController.navigate(Routes.Questions.route) {
+                            popUpTo(Routes.Loading.route) { inclusive = true }
+                        }
+                    }
+                    LoadingScreen()
+                }
+            }
         }
 
         composable(Routes.Questions.route){

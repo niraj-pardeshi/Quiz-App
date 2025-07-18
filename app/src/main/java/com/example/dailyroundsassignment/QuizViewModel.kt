@@ -3,16 +3,21 @@ package com.example.dailyroundsassignment
 import androidx.compose.ui.unit.max
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.dailyroundsassignment.Model.APIResult
 import com.example.dailyroundsassignment.Model.QuizState
 import com.example.dailyroundsassignment.QuizRepository.QuizRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-class QuizViewModel(): ViewModel() {
-    val repository: QuizRepository = QuizRepository()
+@HiltViewModel
+class QuizViewModel @Inject constructor(
+    private val repository: QuizRepository
+): ViewModel() {
 
     private val _quizState = MutableStateFlow(QuizState())
     val quizState: StateFlow<QuizState> = _quizState.asStateFlow()
@@ -22,12 +27,32 @@ class QuizViewModel(): ViewModel() {
     }
 
     fun loadQuestions(){
+        _quizState.value = _quizState.value.copy(
+            isLoading = true
+        )
         viewModelScope.launch {
-            val questions = repository.getQuestions()
-            _quizState.value = _quizState.value.copy(
-                questions = questions,
-                answeredQuestions = MutableList(questions.size) { false }
-            )
+            when( val result = repository.getQuestions()) {
+                is APIResult.Success -> {
+                    _quizState.update {
+                        it.copy(
+                            questions = result.data ?: emptyList(),
+                            isLoading = false,
+                            answeredQuestions = MutableList(result.data.size) { false }
+                        )
+                    }
+                }
+                is APIResult.Error -> {
+                    _quizState.update {
+                        it.copy(
+                            error = result.error,
+                            isLoading = false
+                        )
+                    }
+                }
+                is APIResult.Loading -> {
+                    _quizState.update { it.copy(isLoading = true) }
+                }
+            }
         }
     }
 
